@@ -17,11 +17,11 @@ class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        //tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+        //tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier) // Пример регистрации в коде
     }
     
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        //cell.cellImage.image = UIImage(named: photosName[indexPath.row]) ?? UIImage()
+        //cell.cellImage.image = UIImage(named: photosName[indexPath.row]) ?? UIImage() // Тест
         guard let cellImage = UIImage(named: photosName[indexPath.row]) else {
             return
         }
