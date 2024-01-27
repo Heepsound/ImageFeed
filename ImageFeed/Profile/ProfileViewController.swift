@@ -14,6 +14,8 @@ final class ProfileViewController: UIViewController {
     @IBOutlet private weak var descriptionLabel: UILabel!
     @IBOutlet private weak var exitButton: UIButton!
     
+    // MARK: - Actions
+    
     @IBAction private func touchUpInsideExitButton() {
         
     }
