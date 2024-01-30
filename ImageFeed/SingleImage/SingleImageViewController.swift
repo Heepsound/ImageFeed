@@ -11,7 +11,7 @@ final class SingleImageViewController: UIViewController {
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var scrollView: UIScrollView!
     
-    var image: UIImage! {
+    var image: UIImage? {
         didSet {
             guard isViewLoaded else { return }
             imageView.image = image
@@ -29,7 +29,8 @@ final class SingleImageViewController: UIViewController {
         rescaleAndCenterImageInScrollView(image: image)
     }
     
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
+    private func rescaleAndCenterImageInScrollView(image: UIImage?) {
+        guard let image = image else { return }
         view.layoutIfNeeded()
         let visibleRectSize = scrollView.bounds.size
         let hScale = visibleRectSize.width / image.size.width
@@ -49,10 +50,8 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func touchUpInsideShareButton() {
-        let share = UIActivityViewController(
-            activityItems: [image!],
-            applicationActivities: nil
-        )
+        guard let image = image else { return }
+        let share = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(share, animated: true, completion: nil)
     }
 }
