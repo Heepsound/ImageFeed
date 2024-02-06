@@ -18,7 +18,6 @@ final class ImagesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        //tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -37,7 +36,6 @@ final class ImagesListViewController: UIViewController {
     }
     
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        //cell.cellImage.image = UIImage(named: photosName[indexPath.row]) ?? UIImage()
         guard let cellImage = UIImage(named: photosName[indexPath.row]) else {
             return
         }
