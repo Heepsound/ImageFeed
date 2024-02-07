@@ -13,11 +13,11 @@ final class OAuth2Service {
     }
     func fetchAuthToken(code: String, handler: @escaping (Result<String, Error>) -> Void) {
         let networkClient = NetworkClient()
-        var urlComponents = URLComponents(string: UnsplashTokenURLString)!
+        var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString)!
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: AccessKey),
-            URLQueryItem(name: "client_secret", value: SecretKey),
-            URLQueryItem(name: "redirect_uri", value: RedirectURI),
+            URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
+            URLQueryItem(name: "client_secret", value: ApiConstants.secretKey),
+            URLQueryItem(name: "redirect_uri", value: ApiConstants.redirectURI),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
