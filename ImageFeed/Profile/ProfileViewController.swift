@@ -32,9 +32,10 @@ final class ProfileViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
-    private var exitButton: UIButton = {
+    private lazy var exitButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "Exit"), for: .normal)
+        button.addTarget(self, action: #selector(touchUpInsideExitButton), for: .touchUpInside)
         return button
     }()
     
@@ -49,7 +50,6 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        exitButton.addTarget(self, action: #selector(touchUpInsideExitButton), for: .touchUpInside)
         userPhoto = UIImage(named: "UserPhoto")
         addSubViews()
         applyConstraints()
