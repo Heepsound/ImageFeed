@@ -7,16 +7,19 @@
 
 import Foundation
 
-protocol NetworkRouting {
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+protocol NetworkClientDelegate: AnyObject {
+    var task: URLSessionTask? { get set }
 }
 
-struct NetworkClient: NetworkRouting {
+struct NetworkClient {
+    weak var delegate: NetworkClientDelegate?
     private enum NetworkError: Error {
         case codeError
     }
-    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
-        let request = URLRequest(url: url)
+    
+    func sendPostRequest(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 handler(.failure(error))
@@ -30,6 +33,13 @@ struct NetworkClient: NetworkRouting {
             guard let data = data else { return }
             handler(.success(data))
         }
+        delegate?.task = task
         task.resume()
+    }
+    
+    // MARK: - Lifecycle
+    
+    init(_ delegate: NetworkClientDelegate? = nil) {
+        self.delegate = delegate
     }
 }

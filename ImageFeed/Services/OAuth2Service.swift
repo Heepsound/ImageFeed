@@ -7,12 +7,16 @@
 
 import UIKit
 
-final class OAuth2Service {
-    private enum AuthError: Error {
-        case codeError
-    }
+final class OAuth2Service: NetworkClientDelegate {
+    weak var task: URLSessionTask?
+    private var lastCode: String?
+    
     func fetchAuthToken(code: String, handler: @escaping (Result<String, Error>) -> Void) {
-        let networkClient = NetworkClient()
+        assert(Thread.isMainThread)
+        if lastCode == code { return }
+        task?.cancel()
+        lastCode = code
+        let networkClient = NetworkClient(self)
         var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString)!
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
@@ -21,17 +25,22 @@ final class OAuth2Service {
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
-        networkClient.fetch(url: urlComponents.url!) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let oAuthTokenResponseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    handler(.success(oAuthTokenResponseBody.accessToken))
-                } catch {
+        networkClient.sendPostRequest(url: urlComponents.url!) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let data):
+                    do {
+                        let oAuthTokenResponseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
+                        handler(.success(oAuthTokenResponseBody.accessToken))
+                        self.task = nil
+                    } catch {
+                        self.lastCode = nil
+                        handler(.failure(error))
+                    }
+                case .failure(let error):
+                    self.lastCode = nil
                     handler(.failure(error))
                 }
-            case .failure(let error):
-                handler(.failure(error))
             }
         }
     }

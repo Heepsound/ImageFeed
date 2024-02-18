@@ -48,6 +48,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         dismiss(animated: true) { [weak self] in
             guard let self = self else { return }
+            UIBlockingProgressHUD.animate()
             self.fetchOAuthToken(code)
         }
     }
@@ -55,7 +56,10 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self = self else { return }
+                UIBlockingProgressHUD.dismiss()
+                guard let self = self else {
+                    return
+                }
                 switch result {
                 case .success(let token):
                     self.oAuth2TokenStorage.token = token
