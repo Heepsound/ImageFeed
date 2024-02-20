@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private var userPhotoImageView: UIImageView = {
@@ -46,13 +47,40 @@ final class ProfileViewController: UIViewController {
         }
     }
     
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        userPhoto = UIImage(named: "UserPhoto")
         addSubViews()
         applyConstraints()
+        updateAvatar()
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateAvatar()
+        }
+        guard let profile = profileService.profile else { return }
+        updateProfileDetails(profile)
+    }
+    
+    private func updateAvatar() {
+        guard let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL) 
+        else { return }
+        let processor = RoundCornerImageProcessor(cornerRadius: 20)
+        userPhotoImageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder.jpeg"), options: [.processor(processor)])
+    }
+    
+    private func updateProfileDetails(_ profile: Profile) {
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
     }
     
     private func addSubViews() {

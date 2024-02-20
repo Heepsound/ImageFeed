@@ -7,8 +7,8 @@
 
 import UIKit
 
-final class OAuth2Service: NetworkClientDelegate {
-    weak var task: URLSessionTask?
+final class OAuth2Service {
+    private weak var task: URLSessionTask?
     private var lastCode: String?
     
     func fetchAuthToken(code: String, handler: @escaping (Result<String, Error>) -> Void) {
@@ -16,7 +16,6 @@ final class OAuth2Service: NetworkClientDelegate {
         if lastCode == code { return }
         task?.cancel()
         lastCode = code
-        let networkClient = NetworkClient(self)
         var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString)!
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
@@ -25,23 +24,20 @@ final class OAuth2Service: NetworkClientDelegate {
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
-        networkClient.sendPostRequest(url: urlComponents.url!) { result in
+        var request = URLRequest(url: urlComponents.url!)
+        request.httpMethod = "POST"
+        task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let data):
-                    do {
-                        let oAuthTokenResponseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                        handler(.success(oAuthTokenResponseBody.accessToken))
-                        self.task = nil
-                    } catch {
-                        self.lastCode = nil
-                        handler(.failure(error))
-                    }
+                case .success(let responseBody):
+                    self?.task = nil
+                    handler(.success(responseBody.accessToken))
                 case .failure(let error):
-                    self.lastCode = nil
+                    self?.lastCode = nil
                     handler(.failure(error))
                 }
             }
         }
+        task?.resume()
     }
 }

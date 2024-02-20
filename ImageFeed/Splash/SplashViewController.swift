@@ -12,11 +12,12 @@ final class SplashViewController: UIViewController {
     
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let token = oAuth2TokenStorage.token {
-            switchToTabBarController()
+            self.fetchProfile(token: token)
         } else {
             performSegue(withIdentifier: showAuthenticationViewSegueIdentifier, sender: nil)
         }
@@ -56,18 +57,36 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
-                guard let self = self else {
-                    return
-                }
+                guard let self = self else { return }
                 switch result {
                 case .success(let token):
                     self.oAuth2TokenStorage.token = token
-                    self.switchToTabBarController()
+                    self.fetchProfile(token: token)
                 case .failure:
+                    UIBlockingProgressHUD.dismiss()
                     return
                 }
             }
+        }
+    }
+    
+    private func fetchProfile(token: String) {
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success:
+                self?.switchToTabBarController()
+            case .failure:
+                let alert = UIAlertController(title: "Что-то пошло не так(",
+                                              message: "Не удалось войти в систему",
+                                              preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ок", style: .default) { _ in }
+                alert.addAction(action)
+                self?.present(alert, animated: true, completion: nil)
+                return
+            }
+            guard let userName = self?.profileService.profile?.username else { return }
+            ProfileImageService.shared.fetchProfileImageURL(username: userName, token: token) { _ in }
         }
     }
 }
