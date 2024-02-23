@@ -33,6 +33,7 @@ final class ProfileImageService {
                     handler(.success(responseBody.profileImage.small))
                 case .failure(let error):
                     handler(.failure(error))
+                    URLSession.printError(service: "fetchProfileImageURL", errorType: "DataError", desc: "Ошибка получения URL аватара профиля")
                 }
                 self?.task = nil
             }

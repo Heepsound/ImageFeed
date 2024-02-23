@@ -32,6 +32,7 @@ final class ProfileService {
                     handler(.success(profile))
                 case .failure(let error):
                     handler(.failure(error))
+                    URLSession.printError(service: "fetchProfile", errorType: "DataError", desc: "Ошибка создания модели профиля")
                 }
                 self?.task = nil
             }

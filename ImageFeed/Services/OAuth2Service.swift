@@ -35,6 +35,7 @@ final class OAuth2Service {
                 case .failure(let error):
                     self?.lastCode = nil
                     handler(.failure(error))
+                    URLSession.printError(service: "fetchAuthToken", errorType: "DataError", desc: "Не получен токен")
                 }
             }
         }
