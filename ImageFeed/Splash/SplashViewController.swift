@@ -18,33 +18,29 @@ final class SplashViewController: UIViewController {
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
  
+    // MARK: - Lifecycle
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let token = oAuth2TokenStorage.token {
             self.fetchProfile(token: token)
         } else {
-            let authViewController = UIStoryboard(name: "Main", bundle: .main)
-                .instantiateViewController(withIdentifier: "AuthViewController") as! AuthViewController
+            let authViewController = AuthViewController()
             authViewController.delegate = self
-            authViewController.modalPresentationStyle = .fullScreen
-            self.present(authViewController, animated: false, completion: nil)
+            let navigationController = NavigationController(rootViewController: authViewController)
+            navigationController.modalPresentationStyle = .fullScreen
+            self.present(navigationController, animated: false, completion: nil)
         }
     }
     
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
-        let tabBarController = UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(withIdentifier: "TabBarViewController")
-        window.rootViewController = tabBarController
+        window.rootViewController = TabBarController()
+        window.makeKeyAndVisible()
     }
     
     private func addSubViews() {
-        addSubview(logoImageView)
-    }
-
-    private func addSubview(_ subView: UIView) {
-        subView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(subView)
+        view.addSubviewWithoutAutoresizingMask(logoImageView)
     }
     
     private func applyConstraints() {
