@@ -10,7 +10,10 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private var userPhotoImageView: UIImageView = {
-        return UIImageView()
+        let imageView = UIImageView()
+        imageView.layer.cornerRadius = 35
+        imageView.layer.masksToBounds = true
+        return imageView
     }()
     private var nameLabel: UILabel = {
         let label = UILabel()
@@ -31,6 +34,7 @@ final class ProfileViewController: UIViewController {
         label.text = "Hello, world!"
         label.textColor = .imageFeedWhite
         label.font = UIFont.systemFont(ofSize: 13)
+        label.numberOfLines = 0
         return label
     }()
     private lazy var exitButton: UIButton = {
@@ -49,7 +53,7 @@ final class ProfileViewController: UIViewController {
         super.viewDidLoad()
         setupProfileViewController()
         profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.DidChangeNotification,
+            forName: ProfileImageService.didChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
@@ -83,15 +87,18 @@ final class ProfileViewController: UIViewController {
         ])
         NSLayoutConstraint.activate([
             nameLabel.topAnchor.constraint(equalTo: userPhotoImageView.bottomAnchor, constant: 8),
-            nameLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor)
+            nameLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor),
+            nameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
         NSLayoutConstraint.activate([
             loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
-            loginNameLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor)
+            loginNameLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor),
+            loginNameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
         NSLayoutConstraint.activate([
             descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor)
+            descriptionLabel.leadingAnchor.constraint(equalTo: userPhotoImageView.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
         NSLayoutConstraint.activate([
             exitButton.heightAnchor.constraint(equalToConstant: 24),

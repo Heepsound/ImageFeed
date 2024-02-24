@@ -20,6 +20,11 @@ final class SplashViewController: UIViewController {
  
     // MARK: - Lifecycle
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupSplashViewController()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if let token = oAuth2TokenStorage.token {
@@ -39,6 +44,11 @@ final class SplashViewController: UIViewController {
         window.makeKeyAndVisible()
     }
     
+    private func setupSplashViewController() {
+        addSubViews()
+        applyConstraints()
+    }
+    
     private func addSubViews() {
         view.addSubviewWithoutAutoresizingMask(logoImageView)
     }
@@ -47,8 +57,8 @@ final class SplashViewController: UIViewController {
         NSLayoutConstraint.activate([
             logoImageView.heightAnchor.constraint(equalToConstant: 76),
             logoImageView.widthAnchor.constraint(equalToConstant: 73),
-            logoImageView.topAnchor.constraint(equalTo: view.centerYAnchor),
-            logoImageView.leadingAnchor.constraint(equalTo: view.centerXAnchor)
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
 }

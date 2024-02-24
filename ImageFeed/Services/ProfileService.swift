@@ -12,12 +12,15 @@ final class ProfileService {
     private(set) var profile: Profile?
     private weak var task: URLSessionTask?
     
+    private init() { }
+    
     func fetchProfile(_ token: String, handler: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         if task != nil { return }
-        var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false)!
+        guard var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
         urlComponents.path = "/me"
-        var request = URLRequest(url: urlComponents.url!)
+        guard let url = urlComponents.url else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<ProfileResponseBody, Error>) in

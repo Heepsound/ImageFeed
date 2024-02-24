@@ -11,14 +11,17 @@ final class ProfileImageService {
     static let shared = ProfileImageService()
     private(set) var avatarURL: String?
     private weak var task: URLSessionTask?
-    static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    
+    private init() { }
     
     func fetchProfileImageURL(username: String, token: String, handler: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         if task != nil { return }
-        var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false)!
+        guard var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
         urlComponents.path = "/users/\(username)"
-        var request = URLRequest(url: urlComponents.url!)
+        guard let url = urlComponents.url else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<UserResponseBody, Error>) in
@@ -27,7 +30,7 @@ final class ProfileImageService {
                 case .success(let responseBody):
                     self?.avatarURL = responseBody.profileImage.small
                     NotificationCenter.default.post(
-                            name: ProfileImageService.DidChangeNotification,
+                            name: ProfileImageService.didChangeNotification,
                             object: self,
                             userInfo: ["URL": responseBody.profileImage.small])
                     handler(.success(responseBody.profileImage.small))
