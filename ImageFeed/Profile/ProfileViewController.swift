@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private var userPhotoImageView: UIImageView = {
@@ -14,21 +15,21 @@ final class ProfileViewController: UIViewController {
     private var nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Екатерина Новикова"
-        label.textColor = UIColor(named: "YP White")
+        label.textColor = .imageFeedWhite
         label.font = UIFont.boldSystemFont(ofSize: 23)
         return label
     }()
     private var loginNameLabel: UILabel = {
         let label = UILabel()
         label.text = "@ekaterina_nov"
-        label.textColor = UIColor(named: "YP Gray")
+        label.textColor = .imageFeedGray
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
     private var descriptionLabel: UILabel = {
         let label = UILabel()
         label.text = "Hello, world!"
-        label.textColor = UIColor(named: "YP White")
+        label.textColor = .imageFeedWhite
         label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
@@ -38,36 +39,41 @@ final class ProfileViewController: UIViewController {
         button.addTarget(self, action: #selector(touchUpInsideExitButton), for: .touchUpInside)
         return button
     }()
-    
-    private var userPhoto: UIImage? {
-        didSet {
-            guard isViewLoaded else { return }
-            userPhotoImageView.image = userPhoto
-        }
-    }
+        
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        userPhoto = UIImage(named: "UserPhoto")
+        setupProfileViewController()
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateAvatar()
+        }
+    }
+    
+    private func setupProfileViewController() {
+        view.backgroundColor = .imageFeedBlack
         addSubViews()
         applyConstraints()
+        updateAvatar()
+        updateProfileDetails()
     }
     
     private func addSubViews() {
-        addSubview(userPhotoImageView)
-        addSubview(nameLabel)
-        addSubview(loginNameLabel)
-        addSubview(descriptionLabel)
-        addSubview(exitButton)
+        view.addSubviewWithoutAutoresizingMask(userPhotoImageView)
+        view.addSubviewWithoutAutoresizingMask(nameLabel)
+        view.addSubviewWithoutAutoresizingMask(loginNameLabel)
+        view.addSubviewWithoutAutoresizingMask(descriptionLabel)
+        view.addSubviewWithoutAutoresizingMask(exitButton)
     }
 
-    private func addSubview(_ subView: UIView) {
-        subView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(subView)
-    }
-    
     private func applyConstraints() {
         NSLayoutConstraint.activate([
             userPhotoImageView.heightAnchor.constraint(equalToConstant: 70),
@@ -93,6 +99,19 @@ final class ProfileViewController: UIViewController {
             exitButton.centerYAnchor.constraint(equalTo: userPhotoImageView.centerYAnchor),
             exitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
+    }
+    
+    private func updateAvatar() {
+        let processor = RoundCornerImageProcessor(cornerRadius: 20)
+        guard let profileImageURL = ProfileImageService.shared.avatarURL, let url = URL(string: profileImageURL) else { return }
+        userPhotoImageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder.jpeg"), options: [.processor(processor)])
+    }
+    
+    private func updateProfileDetails() {
+        guard let profile = profileService.profile else { return }
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
     }
     
     // MARK: - Actions

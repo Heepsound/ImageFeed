@@ -8,11 +8,14 @@
 import UIKit
 
 final class OAuth2Service {
-    private enum AuthError: Error {
-        case codeError
-    }
+    private weak var task: URLSessionTask?
+    private var lastCode: String?
+    
     func fetchAuthToken(code: String, handler: @escaping (Result<String, Error>) -> Void) {
-        let networkClient = NetworkClient()
+        assert(Thread.isMainThread)
+        if lastCode == code { return }
+        task?.cancel()
+        lastCode = code
         var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString)!
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
@@ -21,18 +24,21 @@ final class OAuth2Service {
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
-        networkClient.fetch(url: urlComponents.url!) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let oAuthTokenResponseBody = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    handler(.success(oAuthTokenResponseBody.accessToken))
-                } catch {
+        var request = URLRequest(url: urlComponents.url!)
+        request.httpMethod = "POST"
+        task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let responseBody):
+                    self?.task = nil
+                    handler(.success(responseBody.accessToken))
+                case .failure(let error):
+                    self?.lastCode = nil
                     handler(.failure(error))
+                    URLSession.printError(service: "fetchAuthToken", errorType: "DataError", desc: "Не получен токен")
                 }
-            case .failure(let error):
-                handler(.failure(error))
             }
         }
+        task?.resume()
     }
 }

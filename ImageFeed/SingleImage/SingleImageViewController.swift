@@ -8,8 +8,29 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
-    @IBOutlet private weak var imageView: UIImageView!
-    @IBOutlet private weak var scrollView: UIScrollView!
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.delegate = self
+        return scrollView
+    }()
+    private var imageView: UIImageView = {
+        let cellImage = UIImageView()
+        cellImage.contentMode = .scaleAspectFill
+        cellImage.backgroundColor = .clear
+        return cellImage
+    }()
+    private lazy var backButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "Backward"), for: .normal)
+        button.addTarget(self, action: #selector(touchUpInsideBackButton), for: .touchUpInside)
+        return button
+    }()
+    private lazy var shareButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "Sharing"), for: .normal)
+        button.addTarget(self, action: #selector(touchUpInsideShareButton), for: .touchUpInside)
+        return button
+    }()
     
     var image: UIImage? {
         didSet {
@@ -23,10 +44,51 @@ final class SingleImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupSingleImageViewController()
+    }
+    
+    private func setupSingleImageViewController() {
+        view.backgroundColor = .imageFeedBlack
+        addSubViews()
+        applyConstraints()
         imageView.image = image
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 2
         rescaleAndCenterImageInScrollView(image: image)
+    }
+    
+    private func addSubViews() {
+        view.addSubviewWithoutAutoresizingMask(scrollView)
+        scrollView.addSubviewWithoutAutoresizingMask(imageView)
+        view.addSubviewWithoutAutoresizingMask(backButton)
+        view.addSubviewWithoutAutoresizingMask(shareButton)
+    }
+    
+    private func applyConstraints() {
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            imageView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
+        ])
+        NSLayoutConstraint.activate([
+            backButton.heightAnchor.constraint(equalToConstant: 24),
+            backButton.widthAnchor.constraint(equalToConstant: 24),
+            backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 55),
+            backButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 9)
+        ])
+        NSLayoutConstraint.activate([
+            shareButton.heightAnchor.constraint(equalToConstant: 50),
+            shareButton.widthAnchor.constraint(equalToConstant: 50),
+            shareButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            shareButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -36)
+        ])
     }
     
     private func rescaleAndCenterImageInScrollView(image: UIImage?) {
@@ -45,11 +107,11 @@ final class SingleImageViewController: UIViewController {
     
     // MARK: - Actions
     
-    @IBAction private func touchUpInsideBackButton() {
+    @objc private func touchUpInsideBackButton() {
         dismiss(animated: true, completion: nil)
     }
     
-    @IBAction private func touchUpInsideShareButton() {
+    @objc private func touchUpInsideShareButton() {
         guard let image = image else { return }
         let share = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(share, animated: true, completion: nil)

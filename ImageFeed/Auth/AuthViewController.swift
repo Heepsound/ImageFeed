@@ -12,17 +12,63 @@ protocol AuthViewControllerDelegate: AnyObject {
 } 
 
 final class AuthViewController: UIViewController {
+    private lazy var unsplashLogo: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "UnsplashLogo")
+        return imageView
+    }()
+    private lazy var authButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setTitle("Войти", for: .normal)
+        button.setTitleColor(.imageFeedBlack, for: .normal)
+        button.backgroundColor = .imageFeedWhite
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        button.addTarget(self, action: #selector(touchUpInsideAuthButton), for: .touchUpInside)
+        return button
+    }()
+    
     private let showWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showWebViewSegueIdentifier {
-            guard let webViewViewController = segue.destination as? WebViewViewController
-                else { fatalError("Failed to prepare for \(showWebViewSegueIdentifier)") }
-            webViewViewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupAuthViewController()
+    }
+    
+    private func setupAuthViewController() {
+        view.backgroundColor = .imageFeedBlack
+        addSubViews()
+        applyConstraints()
+    }
+    
+    private func addSubViews() {
+        view.addSubviewWithoutAutoresizingMask(unsplashLogo)
+        view.addSubviewWithoutAutoresizingMask(authButton)
+    }
+
+    private func applyConstraints() {
+        NSLayoutConstraint.activate([
+            unsplashLogo.heightAnchor.constraint(equalToConstant: 60),
+            unsplashLogo.widthAnchor.constraint(equalToConstant: 60),
+            unsplashLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            unsplashLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        NSLayoutConstraint.activate([
+            authButton.heightAnchor.constraint(equalToConstant: 48),
+            authButton.widthAnchor.constraint(equalToConstant: 343),
+            authButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            authButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -130)
+        ])
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func touchUpInsideAuthButton() {
+        let webViewViewController = WebViewViewController()
+        webViewViewController.delegate = self
+        self.navigationController?.pushViewController(webViewViewController, animated: true)
     }
 }
     
