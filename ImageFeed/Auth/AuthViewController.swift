@@ -23,6 +23,8 @@ final class AuthViewController: UIViewController {
         button.setTitleColor(.imageFeedBlack, for: .normal)
         button.backgroundColor = .imageFeedWhite
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(touchUpInsideAuthButton), for: .touchUpInside)
         return button
     }()

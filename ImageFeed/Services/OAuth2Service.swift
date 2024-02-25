@@ -16,7 +16,7 @@ final class OAuth2Service {
         if lastCode == code { return }
         task?.cancel()
         lastCode = code
-        var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString)!
+        guard var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString) else { return }
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
             URLQueryItem(name: "client_secret", value: ApiConstants.secretKey),
@@ -24,7 +24,8 @@ final class OAuth2Service {
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
-        var request = URLRequest(url: urlComponents.url!)
+        guard let url = urlComponents.url else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             DispatchQueue.main.async {
