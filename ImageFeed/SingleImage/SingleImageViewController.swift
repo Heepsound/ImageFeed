@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
@@ -14,10 +15,11 @@ final class SingleImageViewController: UIViewController {
         return scrollView
     }()
     private var imageView: UIImageView = {
-        let cellImage = UIImageView()
-        cellImage.contentMode = .scaleAspectFill
-        cellImage.backgroundColor = .clear
-        return cellImage
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .clear
+        imageView.image = UIImage(named: "Scrible")
+        return imageView
     }()
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,13 +34,7 @@ final class SingleImageViewController: UIViewController {
         return button
     }()
     
-    var image: UIImage? {
-        didSet {
-            guard isViewLoaded else { return }
-            imageView.image = image
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    var imageURL: String?
     
     // MARK: - Lifecycle
     
@@ -51,10 +47,16 @@ final class SingleImageViewController: UIViewController {
         view.backgroundColor = .imageFeedBlack
         addSubViews()
         applyConstraints()
-        imageView.image = image
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 2
-        rescaleAndCenterImageInScrollView(image: image)
+        rescaleAndCenterImageInScrollView()
+        guard let url = URL(string: imageURL ?? "") else { return }
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(with: url, placeholder: UIImage(named: "Scrible"), options: []) { _ in
+            DispatchQueue.main.async {
+                self.rescaleAndCenterImageInScrollView()
+            }
+        }
     }
     
     private func addSubViews() {
@@ -91,8 +93,8 @@ final class SingleImageViewController: UIViewController {
         ])
     }
     
-    private func rescaleAndCenterImageInScrollView(image: UIImage?) {
-        guard let image = image else { return }
+    private func rescaleAndCenterImageInScrollView() {
+        guard let image = imageView.image else { return }
         view.layoutIfNeeded()
         let visibleRectSize = scrollView.bounds.size
         let hScale = visibleRectSize.width / image.size.width
@@ -112,7 +114,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     @objc private func touchUpInsideShareButton() {
-        guard let image = image else { return }
+        guard let image = imageView.image else { return }
         let share = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(share, animated: true, completion: nil)
     }

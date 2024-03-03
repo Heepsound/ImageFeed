@@ -15,7 +15,6 @@ final class SplashViewController: UIViewController {
     }()
     
     private let oAuth2Service = OAuth2Service()
-    private let oAuth2TokenStorage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
  
     // MARK: - Lifecycle
@@ -27,7 +26,7 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if let token = oAuth2TokenStorage.token {
+        if let token = OAuth2TokenStorage.token {
             self.fetchProfile(token: token)
         } else {
             let authViewController = AuthViewController()
@@ -78,7 +77,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success(let token):
-                    self.oAuth2TokenStorage.token = token
+                    OAuth2TokenStorage.token = token
                     self.fetchProfile(token: token)
                 case .failure:
                     UIBlockingProgressHUD.dismiss()

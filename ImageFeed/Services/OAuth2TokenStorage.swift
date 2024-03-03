@@ -12,7 +12,7 @@ final class OAuth2TokenStorage {
     private enum Keys: String {
         case token
     }
-    var token: String? {
+    static var token: String? {
         get {
             let token: String? = KeychainWrapper.standard.string(forKey: Keys.token.rawValue)
             return token

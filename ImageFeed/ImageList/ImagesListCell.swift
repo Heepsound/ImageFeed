@@ -6,17 +6,18 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImageListCell"
     
     private var cellImage: UIImageView = {
-        let cellImage = UIImageView()
-        cellImage.contentMode = .scaleAspectFill
-        cellImage.backgroundColor = .clear
-        cellImage.layer.cornerRadius = 16
-        cellImage.layer.masksToBounds = true
-        return cellImage
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .clear
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        return imageView
     }()
     private lazy var likeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,9 +33,11 @@ final class ImagesListCell: UITableViewCell {
         return label
     }()
     
-    var image: UIImage? {
+    var imageURL: String? {
         didSet {
-            cellImage.image = image
+            guard let url = URL(string: imageURL ?? "") else { return }
+            cellImage.kf.indicatorType = .activity
+            cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Scrible"))
         }
     }
     

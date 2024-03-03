@@ -21,13 +21,23 @@ final class ImagesListViewController: UIViewController {
         return ImagesListCell(style: .default, reuseIdentifier: ImagesListCell.reuseIdentifier)
     }()
     
-    private let photosName: [String] = Array(0..<20).map{"\($0)"}
+    private let imagesListService = ImagesListService.shared
+    private var imagesListServiceObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupImagesListViewController()
+        imagesListService.fetchPhotosNextPage()
+        imagesListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateTableViewAnimated()
+        }
     }
     
     private func setupImagesListViewController() {
@@ -49,17 +59,22 @@ final class ImagesListViewController: UIViewController {
         ])
     }
     
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let cellImage = UIImage(named: photosName[indexPath.row]) else { return }
-        cell.image = cellImage
-        cell.imageDate = Date()
-        cell.isFavorites = indexPath.row % 2 == 0
+    func updateTableViewAnimated() {
+        guard let newPhotosCount = imagesListService.lastLoadedPhotosCount else { return }
+        if newPhotosCount == 0 { return }
+        tableView.performBatchUpdates {
+            let photosCount = imagesListService.photos.count
+            let indexPaths = (photosCount - newPhotosCount..<photosCount).map { i in
+                IndexPath(row: i, section: 0)
+            }
+            tableView.insertRows(at: indexPaths, with: .automatic)
+        }
     }
 }
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return photosName.count
+        return imagesListService.photos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -67,24 +82,32 @@ extension ImagesListViewController: UITableViewDataSource {
         guard let imageCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
-        configCell(for: imageCell, with: indexPath)
+        let photo = imagesListService.photos[indexPath.row]
+        imageCell.imageURL = photo.thumbImageURL
+        imageCell.imageDate = photo.createdAt
+        imageCell.isFavorites = photo.isLiked
         return imageCell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let cellImage = UIImage(named: photosName[indexPath.row]) else {
-            return 0
+        let photo = imagesListService.photos[indexPath.row]
+        let ratio = (tableView.bounds.width - 32) / photo.size.width
+        return photo.size.height * ratio + 8
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row + 1 == imagesListService.photos.count {
+            imagesListService.fetchPhotosNextPage()
         }
-        let ratio = (tableView.bounds.width - 32) / cellImage.size.width
-        return cellImage.size.height * ratio + 8
     }
 }
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let singleImageViewController = SingleImageViewController()
+        let photo = imagesListService.photos[indexPath.row]
         singleImageViewController.modalPresentationStyle = .fullScreen
-        singleImageViewController.image = UIImage(named: photosName[indexPath.row])
+        singleImageViewController.imageURL = photo.largeImageURL
         self.present(singleImageViewController, animated: false, completion: nil)
     }
 }
