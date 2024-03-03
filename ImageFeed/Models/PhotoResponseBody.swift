@@ -7,6 +7,10 @@
 
 import Foundation
 
+struct LikeResponseBody: Decodable {
+    let photo: PhotoResponseBody
+}
+
 struct PhotoResponseBody: Decodable {
     let id: String
     let createdAt: String

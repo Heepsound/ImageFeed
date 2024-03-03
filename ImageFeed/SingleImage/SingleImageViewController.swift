@@ -50,13 +50,7 @@ final class SingleImageViewController: UIViewController {
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 2
         rescaleAndCenterImageInScrollView()
-        guard let url = URL(string: imageURL ?? "") else { return }
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(with: url, placeholder: UIImage(named: "Scrible"), options: []) { _ in
-            DispatchQueue.main.async {
-                self.rescaleAndCenterImageInScrollView()
-            }
-        }
+        loadImage()
     }
     
     private func addSubViews() {
@@ -93,6 +87,23 @@ final class SingleImageViewController: UIViewController {
         ])
     }
     
+    private func loadImage() {
+        guard let url = URL(string: imageURL ?? "") else { return }
+        imageView.kf.indicatorType = .activity
+        UIBlockingProgressHUD.animate()
+        imageView.kf.setImage(with: url) { [weak self] result in
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                switch result {
+                case .success(_):
+                    self?.rescaleAndCenterImageInScrollView()
+                case .failure:
+                    self?.showError()
+                }
+            }
+        }
+    }
+    
     private func rescaleAndCenterImageInScrollView() {
         guard let image = imageView.image else { return }
         view.layoutIfNeeded()
@@ -105,6 +116,19 @@ final class SingleImageViewController: UIViewController {
         let x = (scrollView.contentSize.width - visibleRectSize.width) / 2
         let y = (scrollView.contentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    }
+    
+    func showError() {
+        let alert = UIAlertController(title: "Что-то пошло не так(",
+                                      message: "Попробовать еще раз?",
+                                      preferredStyle: .alert)
+        let actionCancel = UIAlertAction(title: "Не надо", style: .default) { _ in }
+        alert.addAction(actionCancel)
+        let actionRepeat = UIAlertAction(title: "Повторить", style: .default) { _ in
+            self.loadImage()
+        }
+        alert.addAction(actionRepeat)
+        self.present(alert, animated: true, completion: nil)
     }
     
     // MARK: - Actions

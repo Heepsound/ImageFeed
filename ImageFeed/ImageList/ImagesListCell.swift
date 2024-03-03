@@ -8,9 +8,11 @@
 import UIKit
 import Kingfisher
 
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
+}
+
 final class ImagesListCell: UITableViewCell {
-    static let reuseIdentifier = "ImageListCell"
-    
     private var cellImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -57,6 +59,9 @@ final class ImagesListCell: UITableViewCell {
             likeButton.setImage(likeButtonImage, for: .normal)
         }
     }
+    
+    static let reuseIdentifier = "ImageListCell"
+    weak var delegate: ImagesListCellDelegate?
     
     // MARK: - Lifecycle
     
@@ -106,6 +111,6 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - Actions
     
     @objc private func touchUpInsidelikeButton() {
-        isFavorites = !(isFavorites ?? false) as Bool
+        delegate?.imageListCellDidTapLike(self)
     }
 }

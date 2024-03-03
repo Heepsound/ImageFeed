@@ -83,6 +83,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let photo = imagesListService.photos[indexPath.row]
+        imageCell.delegate = self
         imageCell.imageURL = photo.thumbImageURL
         imageCell.imageDate = photo.createdAt
         imageCell.isFavorites = photo.isLiked
@@ -109,6 +110,26 @@ extension ImagesListViewController: UITableViewDelegate {
         singleImageViewController.modalPresentationStyle = .fullScreen
         singleImageViewController.imageURL = photo.largeImageURL
         self.present(singleImageViewController, animated: false, completion: nil)
+    }
+}
+
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = imagesListService.photos[indexPath.row]
+        UIBlockingProgressHUD.animate()
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] (result: Result<Void, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success():
+                    cell.isFavorites = self?.imagesListService.photos[indexPath.row].isLiked
+                    UIBlockingProgressHUD.dismiss()
+                case .failure(_):
+                    UIBlockingProgressHUD.dismiss()
+                    AlertPresenter.showError(delegate: self)
+                }
+            }
+        }
     }
 }
 
