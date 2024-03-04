@@ -15,7 +15,7 @@ protocol ImagesListCellDelegate: AnyObject {
 final class ImagesListCell: UITableViewCell {
     private var cellImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .center
         imageView.backgroundColor = .clear
         imageView.layer.cornerRadius = 16
         imageView.layer.masksToBounds = true
@@ -39,7 +39,10 @@ final class ImagesListCell: UITableViewCell {
         didSet {
             guard let url = URL(string: imageURL ?? "") else { return }
             cellImage.kf.indicatorType = .activity
-            cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Scrible"))
+            cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Scrible")) { [weak self] result in
+                guard let self = self else { return }
+                self.cellImage.contentMode = .scaleAspectFill
+            }
         }
     }
     
@@ -48,7 +51,7 @@ final class ImagesListCell: UITableViewCell {
             if let date = imageDate {
                 dateLabel.text = date.dateString
             } else {
-                dateLabel.text = Date().dateString
+                dateLabel.text = ""
             }
         }
     }

@@ -125,6 +125,15 @@ final class ProfileViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func touchUpInsideExitButton() {
-        profileLogoutService.logout()
+        let alert = UIAlertController(title: "Пока, пока!",
+                                      message: "Уверены, что хотите выйти?",
+                                      preferredStyle: .alert)
+        let actionYes = UIAlertAction(title: "Да", style: .default) { _ in
+            self.profileLogoutService.logout()
+        }
+        alert.addAction(actionYes)
+        let actionNo = UIAlertAction(title: "Нет", style: .default) { _ in }
+        alert.addAction(actionNo)
+        self.present(alert, animated: true, completion: nil)
     }
 }
