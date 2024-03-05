@@ -19,13 +19,14 @@
 		E72FE75A2B905B5500E147F6 /* ImagesListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72FE7592B905B5500E147F6 /* ImagesListService.swift */; };
 		E72FE75C2B905BD800E147F6 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72FE75B2B905BD800E147F6 /* Photo.swift */; };
 		E72FE75E2B90605600E147F6 /* PhotoResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72FE75D2B90605600E147F6 /* PhotoResponseBody.swift */; };
+		E74798762B96FD8600C2F296 /* DateFormatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74798752B96FD8600C2F296 /* DateFormatManager.swift */; };
 		E74DDF5D2B948E5000FDF4D4 /* AllertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74DDF5C2B948E5000FDF4D4 /* AllertPresenter.swift */; };
 		E74DDF5F2B949CDE00FDF4D4 /* ProfileLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E74DDF5E2B949CDE00FDF4D4 /* ProfileLogoutService.swift */; };
+		E76575682B97111100BA884D /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76575672B97111100BA884D /* AlertModel.swift */; };
 		E7750C3A2B8641F4002BBC35 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = E7750C392B8641F4002BBC35 /* SwiftKeychainWrapper */; };
 		E7750C3D2B864628002BBC35 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7750C3C2B864628002BBC35 /* TabBarController.swift */; };
 		E796E7412B7DF55000E4EE78 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E796E7402B7DF55000E4EE78 /* ProgressHUD */; };
 		E7A5D0802B88AEE300294AE6 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5D07F2B88AEE300294AE6 /* UIView+Extensions.swift */; };
-		E7A5D0822B88D5C200294AE6 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5D0812B88D5C200294AE6 /* Date+Extensions.swift */; };
 		E7A5D0852B89036E00294AE6 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5D0842B89036E00294AE6 /* NavigationController.swift */; };
 		E7A5D0872B890D0D00294AE6 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A5D0862B890D0D00294AE6 /* UIColor+Extensions.swift */; };
 		E7BDA72F2B831F0200BE142D /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BDA72E2B831F0200BE142D /* ProfileService.swift */; };
@@ -56,11 +57,12 @@
 		E72FE7592B905B5500E147F6 /* ImagesListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListService.swift; sourceTree = "<group>"; };
 		E72FE75B2B905BD800E147F6 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		E72FE75D2B90605600E147F6 /* PhotoResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoResponseBody.swift; sourceTree = "<group>"; };
+		E74798752B96FD8600C2F296 /* DateFormatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatManager.swift; sourceTree = "<group>"; };
 		E74DDF5C2B948E5000FDF4D4 /* AllertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllertPresenter.swift; sourceTree = "<group>"; };
 		E74DDF5E2B949CDE00FDF4D4 /* ProfileLogoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLogoutService.swift; sourceTree = "<group>"; };
+		E76575672B97111100BA884D /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
 		E7750C3C2B864628002BBC35 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E7A5D07F2B88AEE300294AE6 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
-		E7A5D0812B88D5C200294AE6 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		E7A5D0842B89036E00294AE6 /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		E7A5D0862B890D0D00294AE6 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		E7BDA72E2B831F0200BE142D /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
@@ -98,7 +100,6 @@
 		E7020E9A2B848F5D007591DB /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				E7A5D0812B88D5C200294AE6 /* Date+Extensions.swift */,
 				E7A5D0862B890D0D00294AE6 /* UIColor+Extensions.swift */,
 				E7A5D07F2B88AEE300294AE6 /* UIView+Extensions.swift */,
 				E7020E9B2B848FE5007591DB /* URLSession+Extensions.swift */,
@@ -109,6 +110,7 @@
 		E7031C9B2B725DBC00AA0980 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E76575672B97111100BA884D /* AlertModel.swift */,
 				E7031C9C2B725E0E00AA0980 /* OAuthTokenResponseBody.swift */,
 				E72FE75D2B90605600E147F6 /* PhotoResponseBody.swift */,
 				E7BDA7302B8320BA00BE142D /* ProfileResponseBody.swift */,
@@ -123,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				E74DDF5C2B948E5000FDF4D4 /* AllertPresenter.swift */,
+				E74798752B96FD8600C2F296 /* DateFormatManager.swift */,
 				E7031CA32B72752F00AA0980 /* OAuth2TokenStorage.swift */,
 				E7031C9F2B72631E00AA0980 /* OAuth2Service.swift */,
 				E7BDA72E2B831F0200BE142D /* ProfileService.swift */,
@@ -315,7 +318,9 @@
 				E7A5D0852B89036E00294AE6 /* NavigationController.swift in Sources */,
 				E7BDA72F2B831F0200BE142D /* ProfileService.swift in Sources */,
 				E72FE75C2B905BD800E147F6 /* Photo.swift in Sources */,
+				E74798762B96FD8600C2F296 /* DateFormatManager.swift in Sources */,
 				E72060352B49B1DA008A9278 /* ImagesListCell.swift in Sources */,
+				E76575682B97111100BA884D /* AlertModel.swift in Sources */,
 				E7CDC9C62B62A93300A326E6 /* ProfileViewController.swift in Sources */,
 				E7BDA7312B8320BA00BE142D /* ProfileResponseBody.swift in Sources */,
 				E7020E9C2B848FE5007591DB /* URLSession+Extensions.swift in Sources */,
@@ -325,7 +330,6 @@
 				E7BDA7332B83260E00BE142D /* Profile.swift in Sources */,
 				E7031CA72B728DCF00AA0980 /* SplashViewController.swift in Sources */,
 				E7A5D0872B890D0D00294AE6 /* UIColor+Extensions.swift in Sources */,
-				E7A5D0822B88D5C200294AE6 /* Date+Extensions.swift in Sources */,
 				E7031C9D2B725E0E00AA0980 /* OAuthTokenResponseBody.swift in Sources */,
 				E7E5E0B52B6E4A4D00F2C32A /* AuthViewController.swift in Sources */,
 				E7020E972B8474E9007591DB /* ProfileImageService.swift in Sources */,

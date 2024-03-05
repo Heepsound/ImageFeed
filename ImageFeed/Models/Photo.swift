@@ -19,7 +19,7 @@ struct Photo {
     init(photoResponceBody: PhotoResponseBody) {
         self.id = photoResponceBody.id
         self.size = CGSize(width: Double(photoResponceBody.width), height: Double(photoResponceBody.height))
-        self.createdAt = ISO8601DateFormatter().date(from: photoResponceBody.createdAt)
+        self.createdAt = DateFormatManager.shared.iso8601Date(photoResponceBody.createdAt)
         self.welcomeDescription = photoResponceBody.description ?? ""
         self.thumbImageURL = photoResponceBody.urls.thumb
         self.largeImageURL = photoResponceBody.urls.full

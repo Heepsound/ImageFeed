@@ -13,10 +13,10 @@ struct Profile {
     let loginName: String
     let bio: String
     
-    init(username: String, firstName: String, lastName: String, bio: String) {
-        self.username = username
-        self.name = "\(firstName) \(lastName)"
+    init(profileResponseBody: ProfileResponseBody) {
+        self.username = profileResponseBody.userName
+        self.name = "\(profileResponseBody.firstName) \(profileResponseBody.lastName ?? "")"
         self.loginName = "@" + self.username
-        self.bio = bio
+        self.bio = profileResponseBody.bio ?? ""
     }
 }
