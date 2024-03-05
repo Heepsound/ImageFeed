@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
@@ -14,10 +15,11 @@ final class SingleImageViewController: UIViewController {
         return scrollView
     }()
     private var imageView: UIImageView = {
-        let cellImage = UIImageView()
-        cellImage.contentMode = .scaleAspectFill
-        cellImage.backgroundColor = .clear
-        return cellImage
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .clear
+        imageView.image = UIImage(named: "Scrible")
+        return imageView
     }()
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,29 +34,23 @@ final class SingleImageViewController: UIViewController {
         return button
     }()
     
-    var image: UIImage? {
-        didSet {
-            guard isViewLoaded else { return }
-            imageView.image = image
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    var imageURL: String?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSingleImageViewController()
+        loadImage()
     }
     
     private func setupSingleImageViewController() {
         view.backgroundColor = .imageFeedBlack
         addSubViews()
         applyConstraints()
-        imageView.image = image
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 2
-        rescaleAndCenterImageInScrollView(image: image)
+        rescaleAndCenterImageInScrollView()
     }
     
     private func addSubViews() {
@@ -91,8 +87,25 @@ final class SingleImageViewController: UIViewController {
         ])
     }
     
-    private func rescaleAndCenterImageInScrollView(image: UIImage?) {
-        guard let image = image else { return }
+    private func loadImage() {
+        guard let url = URL(string: imageURL ?? "") else { return }
+        imageView.kf.indicatorType = .activity
+        UIBlockingProgressHUD.animate()
+        imageView.kf.setImage(with: url) { [weak self] result in
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                switch result {
+                case .success(_):
+                    self?.rescaleAndCenterImageInScrollView()
+                case .failure:
+                    self?.showError()
+                }
+            }
+        }
+    }
+    
+    private func rescaleAndCenterImageInScrollView() {
+        guard let image = imageView.image else { return }
         view.layoutIfNeeded()
         let visibleRectSize = scrollView.bounds.size
         let hScale = visibleRectSize.width / image.size.width
@@ -105,6 +118,19 @@ final class SingleImageViewController: UIViewController {
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
     }
     
+    func showError() {
+        let alert = UIAlertController(title: "Что-то пошло не так(",
+                                      message: "Попробовать еще раз?",
+                                      preferredStyle: .alert)
+        let actionCancel = UIAlertAction(title: "Не надо", style: .default) { _ in }
+        alert.addAction(actionCancel)
+        let actionRepeat = UIAlertAction(title: "Повторить", style: .default) { _ in
+            self.loadImage()
+        }
+        alert.addAction(actionRepeat)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     // MARK: - Actions
     
     @objc private func touchUpInsideBackButton() {
@@ -112,7 +138,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     @objc private func touchUpInsideShareButton() {
-        guard let image = image else { return }
+        guard let image = imageView.image else { return }
         let share = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(share, animated: true, completion: nil)
     }

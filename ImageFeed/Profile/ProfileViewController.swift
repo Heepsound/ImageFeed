@@ -45,6 +45,7 @@ final class ProfileViewController: UIViewController {
     }()
         
     private let profileService = ProfileService.shared
+    private let profileLogoutService = ProfileLogoutService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
@@ -124,6 +125,15 @@ final class ProfileViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func touchUpInsideExitButton() {
-        
+        let alert = UIAlertController(title: "Пока, пока!",
+                                      message: "Уверены, что хотите выйти?",
+                                      preferredStyle: .alert)
+        let actionYes = UIAlertAction(title: "Да", style: .default) { _ in
+            self.profileLogoutService.logout()
+        }
+        alert.addAction(actionYes)
+        let actionNo = UIAlertAction(title: "Нет", style: .default) { _ in }
+        alert.addAction(actionNo)
+        self.present(alert, animated: true, completion: nil)
     }
 }

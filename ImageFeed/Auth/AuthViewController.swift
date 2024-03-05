@@ -29,7 +29,6 @@ final class AuthViewController: UIViewController {
         return button
     }()
     
-    private let showWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
     
     // MARK: - Lifecycle

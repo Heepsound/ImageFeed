@@ -6,17 +6,20 @@
 //
 
 import UIKit
+import Kingfisher
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
+}
 
 final class ImagesListCell: UITableViewCell {
-    static let reuseIdentifier = "ImageListCell"
-    
     private var cellImage: UIImageView = {
-        let cellImage = UIImageView()
-        cellImage.contentMode = .scaleAspectFill
-        cellImage.backgroundColor = .clear
-        cellImage.layer.cornerRadius = 16
-        cellImage.layer.masksToBounds = true
-        return cellImage
+        let imageView = UIImageView()
+        imageView.contentMode = .center
+        imageView.backgroundColor = .clear
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        return imageView
     }()
     private lazy var likeButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,9 +35,14 @@ final class ImagesListCell: UITableViewCell {
         return label
     }()
     
-    var image: UIImage? {
+    var imageURL: String? {
         didSet {
-            cellImage.image = image
+            guard let url = URL(string: imageURL ?? "") else { return }
+            cellImage.kf.indicatorType = .activity
+            cellImage.kf.setImage(with: url, placeholder: UIImage(named: "Scrible")) { [weak self] result in
+                guard let self = self else { return }
+                self.cellImage.contentMode = .scaleAspectFill
+            }
         }
     }
     
@@ -43,7 +51,7 @@ final class ImagesListCell: UITableViewCell {
             if let date = imageDate {
                 dateLabel.text = date.dateString
             } else {
-                dateLabel.text = Date().dateString
+                dateLabel.text = ""
             }
         }
     }
@@ -54,6 +62,9 @@ final class ImagesListCell: UITableViewCell {
             likeButton.setImage(likeButtonImage, for: .normal)
         }
     }
+    
+    static let reuseIdentifier = "ImageListCell"
+    weak var delegate: ImagesListCellDelegate?
     
     // MARK: - Lifecycle
     
@@ -103,6 +114,6 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - Actions
     
     @objc private func touchUpInsidelikeButton() {
-        isFavorites = !(isFavorites ?? false) as Bool
+        delegate?.imageListCellDidTapLike(self)
     }
 }

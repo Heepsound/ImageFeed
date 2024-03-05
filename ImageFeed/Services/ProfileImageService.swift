@@ -43,4 +43,8 @@ final class ProfileImageService {
         }
         task?.resume()
     }
+    
+    func cleanData() {
+        avatarURL = nil
+    }
 }
