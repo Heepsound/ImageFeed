@@ -35,7 +35,7 @@ final class ImagesListViewController: UIViewController {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.updateTableViewAnimated()
         }
     }
@@ -60,8 +60,7 @@ final class ImagesListViewController: UIViewController {
     }
     
     func updateTableViewAnimated() {
-        guard let newPhotosCount = imagesListService.lastLoadedPhotosCount else { return }
-        if newPhotosCount == 0 { return }
+        guard let newPhotosCount = imagesListService.lastLoadedPhotosCount, newPhotosCount > 0 else { return }
         tableView.performBatchUpdates {
             let photosCount = imagesListService.photos.count
             let indexPaths = (photosCount - newPhotosCount..<photosCount).map { i in

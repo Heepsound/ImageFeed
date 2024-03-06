@@ -27,10 +27,7 @@ final class ProfileService {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let responseBody):
-                    let profile = Profile(username: responseBody.userName,
-                                          firstName: responseBody.firstName,
-                                          lastName: responseBody.lastName,
-                                          bio: (responseBody.bio ?? "") as String)
+                    let profile = Profile(profileResponseBody: responseBody)
                     self?.profile = profile
                     handler(.success(profile))
                 case .failure(let error):

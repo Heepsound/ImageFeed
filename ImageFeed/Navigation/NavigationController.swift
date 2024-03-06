@@ -17,9 +17,7 @@ final class NavigationController: UINavigationController {
     }
     
     private func setupNavigationController() {
-        navigationBar.standardAppearance.backgroundColor = .imageFeedBlack
-        navigationBar.barTintColor = .imageFeedWhite
-        navigationBar.tintColor = .imageFeedWhite
+        self.setNavigationBarHidden(true, animated: false)
     }
 }
     

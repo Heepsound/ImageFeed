@@ -20,7 +20,12 @@ final class WebViewViewController: UIViewController {
         return webView
     }()
     private lazy var progressView: UIProgressView = {
-        return UIProgressView()
+        let progressView = UIProgressView()
+        progressView.progressViewStyle = .default
+        progressView.tintColor = .imageFeedBlack
+        progressView.progressTintColor = .imageFeedBlack
+        progressView.backgroundColor = .none
+        return progressView
     }()
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -41,8 +46,7 @@ final class WebViewViewController: UIViewController {
             \.estimatedProgress,
             options: [],
             changeHandler: { [weak self] _, _ in
-                guard let self = self else { return }
-                self.updateProgress()
+                self?.updateProgress()
             }
         )
     }
@@ -65,17 +69,11 @@ final class WebViewViewController: UIViewController {
     
     private func addSubViews() {
         view.addSubviewWithoutAutoresizingMask(webView)
-        view.addSubviewWithoutAutoresizingMask(progressView)
         view.addSubviewWithoutAutoresizingMask(backButton)
+        view.addSubviewWithoutAutoresizingMask(progressView)
     }
 
     private func applyConstraints() {
-        NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: view.topAnchor),
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
         NSLayoutConstraint.activate([
             backButton.heightAnchor.constraint(equalToConstant: 24),
             backButton.widthAnchor.constraint(equalToConstant: 24),
@@ -84,13 +82,24 @@ final class WebViewViewController: UIViewController {
         ])
         NSLayoutConstraint.activate([
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: backButton.bottomAnchor)
+        ])
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
     
     private func updateProgress() {
-        progressView.setProgress(Float(webView.estimatedProgress), animated: true)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+        let progress = webView.estimatedProgress
+        progressView.setProgress(Float(progress), animated: true)
+        progressView.isHidden = fabs(progress - 1.0) <= 0.0001
+        if progressView.isHidden {
+            progressView.setProgress(Float(0), animated: false)
+        }
     }
     
     // MARK: - Actions

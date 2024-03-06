@@ -49,7 +49,7 @@ final class ImagesListCell: UITableViewCell {
     var imageDate: Date? {
         didSet {
             if let date = imageDate {
-                dateLabel.text = date.dateString
+                dateLabel.text = DateFormatManager.shared.dateToString(date)
             } else {
                 dateLabel.text = ""
             }

@@ -33,7 +33,7 @@ final class SplashViewController: UIViewController {
             authViewController.delegate = self
             let navigationController = NavigationController(rootViewController: authViewController)
             navigationController.modalPresentationStyle = .fullScreen
-            self.present(navigationController, animated: false, completion: nil)
+            self.present(navigationController, animated: true, completion: nil)
         }
     }
     
@@ -65,7 +65,7 @@ final class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             UIBlockingProgressHUD.animate()
             self.fetchOAuthToken(code)
         }
@@ -74,7 +74,7 @@ extension SplashViewController: AuthViewControllerDelegate {
     private func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self = self else { return }
+                guard let self else { return }
                 switch result {
                 case .success(let token):
                     OAuth2TokenStorage.token = token
@@ -89,16 +89,17 @@ extension SplashViewController: AuthViewControllerDelegate {
     
     private func fetchProfile(token: String) {
         profileService.fetchProfile(token) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success:
-                self?.switchToTabBarController()
+                self.switchToTabBarController()
                 UIBlockingProgressHUD.dismiss()
             case .failure:
                 UIBlockingProgressHUD.dismiss()
                 AlertPresenter.showError(delegate: self)
                 return
             }
-            guard let userName = self?.profileService.profile?.username else { return }
+            guard let userName = self.profileService.profile?.username else { return }
             ProfileImageService.shared.fetchProfileImageURL(username: userName, token: token) { _ in }
         }
     }

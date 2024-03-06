@@ -93,12 +93,13 @@ final class SingleImageViewController: UIViewController {
         UIBlockingProgressHUD.animate()
         imageView.kf.setImage(with: url) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 UIBlockingProgressHUD.dismiss()
                 switch result {
                 case .success(_):
-                    self?.rescaleAndCenterImageInScrollView()
+                    self.rescaleAndCenterImageInScrollView()
                 case .failure:
-                    self?.showError()
+                    self.showError()
                 }
             }
         }
@@ -119,16 +120,14 @@ final class SingleImageViewController: UIViewController {
     }
     
     func showError() {
-        let alert = UIAlertController(title: "Что-то пошло не так(",
-                                      message: "Попробовать еще раз?",
-                                      preferredStyle: .alert)
-        let actionCancel = UIAlertAction(title: "Не надо", style: .default) { _ in }
-        alert.addAction(actionCancel)
-        let actionRepeat = UIAlertAction(title: "Повторить", style: .default) { _ in
+        let noAction = AlertActionModel(title: "Не надо") {}
+        let repeatAction = AlertActionModel(title: "Повторить") {
             self.loadImage()
         }
-        alert.addAction(actionRepeat)
-        self.present(alert, animated: true, completion: nil)
+        let alertModel = AlertModel(title: "Что-то пошло не так(",
+                                    message: "Попробовать еще раз?",
+                                    actions: [noAction, repeatAction])
+        AlertPresenter.show(alertModel: alertModel, delegate: self)
     }
     
     // MARK: - Actions
