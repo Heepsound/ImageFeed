@@ -8,8 +8,11 @@
 import UIKit
 
 final class OAuth2Service {
+    static let shared = OAuth2Service()
     private weak var task: URLSessionTask?
     private var lastCode: String?
+    
+    private init() { }
     
     func fetchAuthToken(code: String, handler: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)

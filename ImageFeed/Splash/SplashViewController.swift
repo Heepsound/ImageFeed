@@ -14,7 +14,7 @@ final class SplashViewController: UIViewController {
         return imageView
     }()
     
-    private let oAuth2Service = OAuth2Service()
+    private let oAuth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
  
     // MARK: - Lifecycle
