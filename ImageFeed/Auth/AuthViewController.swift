@@ -67,8 +67,12 @@ final class AuthViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func touchUpInsideAuthButton() {
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
         let webViewViewController = WebViewViewController()
         webViewViewController.delegate = self
+        webViewViewController.presenter = webViewPresenter
+        webViewPresenter.view = webViewViewController
         self.navigationController?.pushViewController(webViewViewController, animated: true)
     }
 }
