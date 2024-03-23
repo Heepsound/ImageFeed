@@ -25,6 +25,7 @@ final class ImagesListCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "FavoritesActive"), for: .normal)
         button.addTarget(self, action: #selector(touchUpInsidelikeButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "LikeButton"
         return button
     }()
     private var dateLabel: UILabel = {

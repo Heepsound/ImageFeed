@@ -25,6 +25,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     private lazy var webView: WKWebView = {
         let webView = WKWebView()
         webView.navigationDelegate = self
+        webView.accessibilityIdentifier = "UnsplashWebView"
         return webView
     }()
     private lazy var progressView: UIProgressView = {

@@ -27,6 +27,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         label.text = "Екатерина Новикова"
         label.textColor = .imageFeedWhite
         label.font = UIFont.boldSystemFont(ofSize: 23)
+        label.accessibilityIdentifier = "ProfileNameLabel"
         return label
     }()
     private var loginNameLabel: UILabel = {
@@ -34,6 +35,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         label.text = "@ekaterina_nov"
         label.textColor = .imageFeedGray
         label.font = UIFont.systemFont(ofSize: 13)
+        label.accessibilityIdentifier = "ProfileLoginLabel"
         return label
     }()
     private var descriptionLabel: UILabel = {
@@ -48,6 +50,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "Exit"), for: .normal)
         button.addTarget(self, action: #selector(touchUpInsideExitButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "ProfileExitButton"
         return button
     }()
     
