@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ApiConstants {
+private enum ApiConstants {
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
     static let unsplashTokenURLString = "https://unsplash.com/oauth/token"
     static let accessKey = "JGzANjYM-bgAuOib94v2tU7d9pgnoNZ6t0remLwMpn4"
@@ -18,28 +18,31 @@ enum ApiConstants {
 }
 
 struct AuthConfiguration {
+    let authURLString: String
+    let tokenURLString: String
     let accessKey: String
     let secretKey: String
     let redirectURI: String
     let accessScope: String
     let defaultBaseURL: URL
-    let authURLString: String
-
+    
     static var standard: AuthConfiguration {
-            return AuthConfiguration(accessKey: ApiConstants.accessKey,
+            return AuthConfiguration(authURLString: ApiConstants.unsplashAuthorizeURLString,
+                                     tokenURLString: ApiConstants.unsplashTokenURLString,
+                                     accessKey: ApiConstants.accessKey,
                                      secretKey: ApiConstants.secretKey,
                                      redirectURI: ApiConstants.redirectURI,
                                      accessScope: ApiConstants.accessScope,
-                                     authURLString: ApiConstants.unsplashAuthorizeURLString,
                                      defaultBaseURL: ApiConstants.defaultBaseURL)
     }
     
-    init(accessKey: String, secretKey: String, redirectURI: String, accessScope: String, authURLString: String, defaultBaseURL: URL) {
+    init(authURLString: String, tokenURLString: String, accessKey: String, secretKey: String, redirectURI: String, accessScope: String, defaultBaseURL: URL) {
+        self.authURLString = authURLString
+        self.tokenURLString = tokenURLString
         self.accessKey = accessKey
         self.secretKey = secretKey
         self.redirectURI = redirectURI
         self.accessScope = accessScope
         self.defaultBaseURL = defaultBaseURL
-        self.authURLString = authURLString
     }
 }

@@ -7,7 +7,13 @@
 
 import UIKit
 
-final class ImagesListViewController: UIViewController {
+public protocol ImagesListViewControllerProtocol: AnyObject {
+    var presenter: ImagesListViewPresenterProtocol? { get set }
+    
+    func showNextPhotos(from firstPhotoIndex: Int, to lastPhotoIndex: Int)
+}
+
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
     private lazy var tableView: UITableView = {
         let tableView = UITableView.init(frame: .zero, style: .plain)
         tableView.dataSource = self
@@ -21,23 +27,15 @@ final class ImagesListViewController: UIViewController {
         return ImagesListCell(style: .default, reuseIdentifier: ImagesListCell.reuseIdentifier)
     }()
     
+    var presenter: ImagesListViewPresenterProtocol?
     private let imagesListService = ImagesListService.shared
-    private var imagesListServiceObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupImagesListViewController()
-        imagesListService.fetchPhotosNextPage()
-        imagesListServiceObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self else { return }
-            self.updateTableViewAnimated()
-        }
+        presenter?.viewDidLoad()
     }
     
     private func setupImagesListViewController() {
@@ -59,11 +57,9 @@ final class ImagesListViewController: UIViewController {
         ])
     }
     
-    func updateTableViewAnimated() {
-        guard let newPhotosCount = imagesListService.lastLoadedPhotosCount, newPhotosCount > 0 else { return }
+    func showNextPhotos(from firstPhotoIndex: Int, to lastPhotoIndex: Int) {
         tableView.performBatchUpdates {
-            let photosCount = imagesListService.photos.count
-            let indexPaths = (photosCount - newPhotosCount..<photosCount).map { i in
+            let indexPaths = (firstPhotoIndex..<lastPhotoIndex).map { i in
                 IndexPath(row: i, section: 0)
             }
             tableView.insertRows(at: indexPaths, with: .automatic)
@@ -96,9 +92,7 @@ extension ImagesListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row + 1 == imagesListService.photos.count {
-            imagesListService.fetchPhotosNextPage()
-        }
+        presenter?.getNextPhotos(indexPath.row + 1)
     }
 }
 
@@ -114,20 +108,15 @@ extension ImagesListViewController: UITableViewDelegate {
 
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = imagesListService.photos[indexPath.row]
+        guard let presenter, let indexPath = tableView.indexPath(for: cell) else { return }
         UIBlockingProgressHUD.animate()
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] (result: Result<Void, Error>) in
-            DispatchQueue.main.async {
-                switch result {
-                case .success():
-                    cell.isFavorites = self?.imagesListService.photos[indexPath.row].isLiked
-                    UIBlockingProgressHUD.dismiss()
-                case .failure(_):
-                    UIBlockingProgressHUD.dismiss()
-                    AlertPresenter.showError(delegate: self)
-                }
+        presenter.changeLike(indexPath.row) { isLiked in
+            if let isLiked {
+                cell.isFavorites = isLiked
+            } else {
+                AlertPresenter.showError(delegate: self)
             }
+            UIBlockingProgressHUD.dismiss()
         }
     }
 }

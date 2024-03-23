@@ -11,6 +11,7 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
     private weak var task: URLSessionTask?
     private var lastCode: String?
+    private var configuration: AuthConfiguration = .standard
     
     private init() { }
     
@@ -19,11 +20,11 @@ final class OAuth2Service {
         if lastCode == code { return }
         task?.cancel()
         lastCode = code
-        guard var urlComponents = URLComponents(string: ApiConstants.unsplashTokenURLString) else { return }
+        guard var urlComponents = URLComponents(string: configuration.tokenURLString) else { return }
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: ApiConstants.accessKey),
-            URLQueryItem(name: "client_secret", value: ApiConstants.secretKey),
-            URLQueryItem(name: "redirect_uri", value: ApiConstants.redirectURI),
+            URLQueryItem(name: "client_id", value: configuration.accessKey),
+            URLQueryItem(name: "client_secret", value: configuration.secretKey),
+            URLQueryItem(name: "redirect_uri", value: configuration.redirectURI),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]

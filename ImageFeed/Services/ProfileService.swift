@@ -11,13 +11,14 @@ final class ProfileService {
     static let shared = ProfileService()
     private(set) var profile: Profile?
     private weak var task: URLSessionTask?
+    private var configuration: AuthConfiguration = .standard
     
     private init() { }
     
     func fetchProfile(_ token: String, handler: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         if task != nil { return }
-        guard var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
+        guard var urlComponents = URLComponents(url: configuration.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
         urlComponents.path = "/me"
         guard let url = urlComponents.url else { return }
         var request = URLRequest(url: url)

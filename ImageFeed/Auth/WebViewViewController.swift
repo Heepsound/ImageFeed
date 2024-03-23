@@ -15,6 +15,7 @@ protocol WebViewViewControllerDelegate: AnyObject {
 
 public protocol WebViewViewControllerProtocol: AnyObject {
     var presenter: WebViewPresenterProtocol? { get set }
+    
     func load(request: URLRequest)
     func setProgressValue(_ newValue: Float)
     func setProgressHidden(_ isHidden: Bool)
@@ -128,9 +129,7 @@ extension WebViewViewController: WKNavigationDelegate {
     }
     
     private func code(from navigationAction: WKNavigationAction) -> String? {
-        guard let url = navigationAction.request.url else {
-            return nil
-        }
+        guard let url = navigationAction.request.url else { return nil }
         return presenter?.code(from: url)
     }
 }
