@@ -20,6 +20,7 @@ final class ImagesListService {
     private weak var taskLikes: URLSessionTask?
     private var lastLoadedPage: Int?
     private(set) var lastLoadedPhotosCount: Int?
+    private var configuration: AuthConfiguration = .standard
     
     private init() { }
     
@@ -28,7 +29,7 @@ final class ImagesListService {
         if taskPhotos != nil { return }
         let nextPage = (lastLoadedPage ?? 0) + 1
         lastLoadedPhotosCount = 0
-        guard var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
+        guard var urlComponents = URLComponents(url: configuration.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
         urlComponents.queryItems = [
             URLQueryItem(name: "page", value: String(nextPage))
         ]
@@ -64,7 +65,7 @@ final class ImagesListService {
             URLSession.printError(service: "changeLike", errorType: "PhotosError", desc: "Не найдена фотография по идентификатору")
             return
         }
-        guard var urlComponents = URLComponents(url: ApiConstants.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
+        guard var urlComponents = URLComponents(url: configuration.defaultBaseURL, resolvingAgainstBaseURL: false) else { return }
         urlComponents.path = "/photos/\(photoId)/like"
         guard let url = urlComponents.url else { return }
         var request = URLRequest(url: url)

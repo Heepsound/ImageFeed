@@ -8,7 +8,14 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+public protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfileViewPresenterProtocol? { get set }
+    
+    func setAvatar(_ url: URL)
+    func setProfileDetails(_ profile: Profile)
+}
+
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     private var userPhotoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 35
@@ -20,6 +27,7 @@ final class ProfileViewController: UIViewController {
         label.text = "Екатерина Новикова"
         label.textColor = .imageFeedWhite
         label.font = UIFont.boldSystemFont(ofSize: 23)
+        label.accessibilityIdentifier = "ProfileNameLabel"
         return label
     }()
     private var loginNameLabel: UILabel = {
@@ -27,6 +35,7 @@ final class ProfileViewController: UIViewController {
         label.text = "@ekaterina_nov"
         label.textColor = .imageFeedGray
         label.font = UIFont.systemFont(ofSize: 13)
+        label.accessibilityIdentifier = "ProfileLoginLabel"
         return label
     }()
     private var descriptionLabel: UILabel = {
@@ -41,34 +50,24 @@ final class ProfileViewController: UIViewController {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "Exit"), for: .normal)
         button.addTarget(self, action: #selector(touchUpInsideExitButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "ProfileExitButton"
         return button
     }()
-        
-    private let profileService = ProfileService.shared
-    private let profileLogoutService = ProfileLogoutService.shared
-    private var profileImageServiceObserver: NSObjectProtocol?
+    
+    var presenter: ProfileViewPresenterProtocol?
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupProfileViewController()
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.updateAvatar()
-        }
+        presenter?.viewDidLoad()
     }
     
     private func setupProfileViewController() {
         view.backgroundColor = .imageFeedBlack
         addSubViews()
         applyConstraints()
-        updateAvatar()
-        updateProfileDetails()
     }
     
     private func addSubViews() {
@@ -109,14 +108,12 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func updateAvatar() {
+    func setAvatar(_ url: URL) {
         let processor = RoundCornerImageProcessor(cornerRadius: 20)
-        guard let profileImageURL = ProfileImageService.shared.avatarURL, let url = URL(string: profileImageURL) else { return }
         userPhotoImageView.kf.setImage(with: url, placeholder: UIImage(named: "placeholder.jpeg"), options: [.processor(processor)])
     }
     
-    private func updateProfileDetails() {
-        guard let profile = profileService.profile else { return }
+    func setProfileDetails(_ profile: Profile) {
         nameLabel.text = profile.name
         loginNameLabel.text = profile.loginName
         descriptionLabel.text = profile.bio
@@ -126,7 +123,7 @@ final class ProfileViewController: UIViewController {
     
     @objc private func touchUpInsideExitButton() {
         let yesAction = AlertActionModel(title: "Да") {
-            self.profileLogoutService.logout()
+            self.presenter?.logout()
         }
         let noAction = AlertActionModel(title: "Нет") {}
         let alertModel = AlertModel(title: "Пока, пока!",

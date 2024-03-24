@@ -26,6 +26,7 @@ final class AuthViewController: UIViewController {
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(touchUpInsideAuthButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "Authenticate"
         return button
     }()
     
@@ -67,8 +68,12 @@ final class AuthViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func touchUpInsideAuthButton() {
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
         let webViewViewController = WebViewViewController()
         webViewViewController.delegate = self
+        webViewViewController.presenter = webViewPresenter
+        webViewPresenter.view = webViewViewController
         self.navigationController?.pushViewController(webViewViewController, animated: true)
     }
 }

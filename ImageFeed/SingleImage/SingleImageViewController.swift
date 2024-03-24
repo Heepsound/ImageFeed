@@ -25,6 +25,7 @@ final class SingleImageViewController: UIViewController {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(named: "Backward"), for: .normal)
         button.addTarget(self, action: #selector(touchUpInsideBackButton), for: .touchUpInside)
+        button.accessibilityIdentifier = "SingleImageBackButton"
         return button
     }()
     private lazy var shareButton: UIButton = {
